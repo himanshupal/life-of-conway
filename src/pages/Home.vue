@@ -1,29 +1,34 @@
 <template>
-	<div class="h-screen grid gap-4 place-content-center text-center dark:bg-gray-900 dark:text-gray-100">
-		<div class="text-9xl rounded border-2 bg-yellow-300 font-retro p-4">{{ count }}</div>
-
-		<div class="flex gap-4 items-center justify-center">
-			<button @click="count++" class="text-6xl text-green-600">+</button>
-			<button @click="count--" class="text-6xl text-red-600">-</button>
+	<div class="min-h-screen min-w-max grid place-content-center text-center dark:bg-gray-900 dark:text-gray-100">
+		<div class="flex flex-col gap-0.5">
+			<div v-for="(row, ok) in grid" :key="`row-${ok}`" class="flex gap-0.5">
+				<div
+					v-for="(cell, ik) in row"
+					:key="`cell-${ik}`"
+					:class="[`w-1 h-1 transition ease-out`, row[ik] ? `bg-blue-400` : `bg-gray-700`]"
+					@mouseover="grid = grid.map((row, a_ok) => row.map((_, a_ik) => a_ok === ok && a_ik === ik))"
+					@mouseleave="grid = grid.map((row, a_ok) => row.map((_, a_ik) => !a_ok === ok && a_ik === ik))"
+				/>
+			</div>
 		</div>
-
-		<div class="font-retro">I am RETRO</div>
-		<div class="font-sans">I am SANS</div>
-		<div class="font-serif">I am SANS-SERIF</div>
 	</div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
+
+const CELLS: number = 100
+
+interface Data {
+	grid: Array<Array<Boolean>>
+}
 
 export default defineComponent({
 	name: 'Home',
 
-	setup() {
-		const count = ref<number>(0)
-
+	data(): Data {
 		return {
-			count
+			grid: new Array(CELLS).fill(new Array(CELLS).fill(false))
 		}
 	}
 })
