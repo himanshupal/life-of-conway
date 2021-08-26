@@ -18,8 +18,7 @@
 						`w-2.5 h-2.5 border border-dotted border-green-600 dark:border-pink-500`,
 						row[ik] ? `bg-blue-50 dark:bg-blue-400` : `dark:bg-gray-700`
 					]"
-					@click="userInput(ok, ik)"
-					@mouseover="userInput(ok, ik)"
+					@mouseenter="userInput(ok, ik)"
 				/>
 			</div>
 		</div>
