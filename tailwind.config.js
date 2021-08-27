@@ -8,6 +8,9 @@ module.exports = {
 			serif: ['Abril Fatface']
 		},
 		extend: {
+			spacing: {
+				screen: '100vh'
+			},
 			fontFamily: {
 				retro: ['Special Elite']
 			}
