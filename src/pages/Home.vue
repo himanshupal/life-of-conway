@@ -15,8 +15,9 @@
 					v-for="(cell, ik) in row"
 					:key="`cell-${ik}`"
 					:class="[
-						`w-2.5 h-2.5 border border-dotted border-green-600 dark:border-pink-500`,
-						row[ik] ? `bg-blue-50 dark:bg-blue-400` : `dark:bg-gray-700`
+						`w-2.5 h-2.5 border border-dashed border-green-600 dark:border-pink-500`,
+						grid[ok][ik] ? `bg-blue-50 dark:bg-blue-400` : `dark:bg-gray-700`,
+						{ 'cursor-pointer': inputEnabled }
 					]"
 					@mousedown="userInput(ok, ik)"
 				/>
@@ -42,21 +43,63 @@ interface Data {
 	grid: Array<Array<Boolean>>
 }
 
+const CellState = {
+	DEAD: false,
+	ALIVE: true
+}
+
 export default defineComponent({
 	name: 'GoLife',
 
 	data(): Data {
+		let grid: Array<Array<boolean>> = new Array(cellsY).fill(new Array(cellsX).fill(CellState.DEAD))
+
 		return {
-			inputEnabled: false,
-			grid: new Array(cellsY).fill(new Array(cellsX).fill(false))
+			inputEnabled: true,
+			grid
 		}
 	},
 
 	methods: {
+		detectNeighbour(outerKey: number, innerKey: number, row: Array<boolean>) {
+			const leftX = innerKey - 1 < 0 ? null : innerKey - 1
+			const rightX = innerKey + 1 >= row.length ? null : innerKey + 1
+			const centerX = innerKey
+			const centerY = outerKey
+			const topY = outerKey - 1 < 0 ? null : outerKey - 1
+			const bottomY = outerKey + 1 >= this.grid.length ? null : outerKey + 1
+
+			return {
+				topLeft: leftX !== null && topY !== null ? this.grid[topY][leftX] : null,
+				top: centerY !== null && topY !== null ? this.grid[topY][centerX] : null,
+				topRight: rightX !== null && topY !== null ? this.grid[topY][rightX] : null,
+
+				left: leftX !== null && centerY !== null ? this.grid[centerY][leftX] : null,
+				center: centerY !== null && centerX !== null ? this.grid[centerY][centerX] : null,
+				right: rightX !== null && centerY !== null ? this.grid[centerY][rightX] : null,
+
+				bottomLeft: leftX !== null && bottomY !== null ? this.grid[bottomY][leftX] : null,
+				bottom: centerX !== null && bottomY !== null ? this.grid[bottomY][centerX] : null,
+				bottomRight: rightX !== null && bottomY !== null ? this.grid[bottomY][rightX] : null
+			}
+		},
+
 		userInput(ok: number, ik: number) {
 			if (this.inputEnabled) {
-				const t_row = this.grid[ok].map((cell, a_ik) => (a_ik === ik ? !cell : cell))
-				this.grid = this.grid.map((row, a_ok) => (a_ok === ok ? t_row : row))
+				this.grid = this.grid.map((row, a_ok) => {
+					return a_ok === ok
+						? row.map((cell, a_ik) => {
+								console.table(
+									this.detectNeighbour(
+										ok,
+										ik,
+										row.map((cell) => cell.valueOf())
+									)
+								)
+								return a_ik === ik ? !cell : cell
+						  })
+						: row
+				})
 			}
 		}
 	},
